@@ -5,7 +5,677 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>連絡帳整頓ツール</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wgh<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>連絡帳整頓ツール</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1a1410;--paper:#f5f0e8;--dark:#e8e0d0;--red:#8b3a2a;--red2:#c4664f;--blue:#4a6e88;--green:#4a7a4e;--muted:#7a6e62;--line:#c8bfb0;--sb:env(safe-area-inset-bottom,0px);--st:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%}
+body{font-family:'Noto Sans JP',sans-serif;background:#2c2420;display:flex;align-items:flex-start;justify-content:center;padding:calc(16px + var(--st)) 10px calc(16px + var(--sb))}
+.book{width:100%;max-width:860px;background:var(--paper);border-radius:2px 8px 8px 2px;box-shadow:-4px 0 0 #5a4a40,-8px 0 0 #3a2e28,4px 8px 32px rgba(0,0,0,.5);position:relative;overflow:hidden}
+.book::before{content:'';position:absolute;left:0;top:0;bottom:0;width:18px;background:linear-gradient(90deg,#3a2e28,#6b4f3e,#3a2e28);z-index:10}
+.inner{margin-left:18px;padding:20px 16px 28px 14px}
+header{border-bottom:2px solid var(--red);padding-bottom:12px;margin-bottom:16px}
+header h1{font-family:'Noto Serif JP',serif;font-size:clamp(.95rem,4.5vw,1.55rem);font-weight:600;color:var(--red);letter-spacing:.08em}
+.subtitle{font-size:.68rem;color:var(--muted);margin-top:3px}
+.tabs{display:flex;gap:2px;margin-bottom:14px}
+.tab{flex:1;padding:10px 4px;background:var(--dark);border:1px solid var(--line);border-bottom:none;cursor:pointer;font-size:.76rem;color:var(--muted);font-family:'Noto Sans JP',sans-serif;text-align:center;border-radius:4px 4px 0 0;touch-action:manipulation;transition:all .15s}
+.tab.on{background:var(--paper);color:var(--red);font-weight:500;position:relative}
+.tab.on::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:var(--paper)}
+.panel{display:none;border:1px solid var(--line);border-radius:0 4px 4px 4px;padding:16px 14px}
+.panel.on{display:block}
+.itabs{display:flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;margin-bottom:14px}
+.itab{flex:1;padding:10px 4px;background:var(--dark);border:none;border-right:1px solid var(--line);cursor:pointer;font-size:.72rem;color:var(--muted);font-family:'Noto Sans JP',sans-serif;text-align:center;touch-action:manipulation;transition:all .15s}
+.itab:last-child{border-right:none}
+.itab.on{background:var(--red);color:#f5f0e8;font-weight:500}
+.imode{display:none}.imode.on{display:block}
+.guide{font-size:.73rem;color:var(--muted);line-height:1.75;margin-bottom:12px;padding:9px 11px;background:var(--dark);border-radius:3px;border-left:3px solid var(--red2)}
+textarea{width:100%;height:190px;padding:11px;font-family:'Noto Sans JP',sans-serif;font-size:.84rem;line-height:1.8;color:var(--ink);background:#faf7f2;border:1px solid var(--line);border-radius:4px;resize:vertical;outline:none;-webkit-appearance:none}
+textarea:focus{border-color:var(--red2)}
+.fzone{display:block;border:2px dashed var(--line);border-radius:6px;padding:22px 14px;text-align:center;cursor:pointer;background:#faf7f2;transition:border-color .2s,background .2s;margin-bottom:10px}
+.fzone:active{border-color:var(--red2);background:#fdf5f3}
+.fzone input{display:none}
+.fz-icon{color:var(--red2);margin-bottom:6px}
+.fz-text{font-size:.8rem;color:var(--muted);line-height:1.6}
+.fz-text strong{color:var(--red)}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.thumb{position:relative;width:70px;height:70px;border-radius:4px;overflow:hidden;border:1px solid var(--line);flex-shrink:0}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.thumb-rm{position:absolute;top:2px;right:2px;background:rgba(26,20,16,.72);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:.58rem;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+.csv-info{font-size:.74rem;color:var(--muted);padding:5px 0 9px}
+.map-title{font-size:.72rem;font-weight:500;color:var(--muted);margin:11px 0 5px}
+.map-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:4px}
+.map-item{display:flex;flex-direction:column;gap:3px}
+.map-item label{font-size:.67rem;color:var(--muted)}
+.msel{font-size:.77rem;padding:6px 22px 6px 7px;border:1px solid var(--line);border-radius:3px;background:var(--paper);color:var(--ink);-webkit-appearance:none;appearance:none;width:100%;font-family:'Noto Sans JP',sans-serif;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a6e62' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center}
+.csv-prev{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:4px}
+.csv-prev table{border-collapse:collapse;font-size:.71rem;min-width:100%}
+.csv-prev th{background:var(--dark);color:var(--red);font-weight:500;padding:5px 8px;border:1px solid var(--line);white-space:nowrap;font-size:.67rem}
+.csv-prev td{padding:4px 8px;border:1px solid var(--line);color:var(--ink);white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis}
+.btn-p{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:13px;background:var(--red);color:#f5f0e8;border:none;border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:.92rem;font-weight:500;cursor:pointer;touch-action:manipulation;-webkit-appearance:none;transition:background .15s;margin-top:12px}
+.btn-p:active,.btn-p:disabled{background:var(--red2)}
+.btn-p:disabled{opacity:.7;cursor:not-allowed}
+.btn-row{display:flex;gap:8px;margin-top:8px}
+.btn-s{flex:1;display:flex;align-items:center;justify-content:center;padding:10px;background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:.78rem;cursor:pointer;touch-action:manipulation;-webkit-appearance:none}
+.btn-s:active{border-color:var(--red2);color:var(--red)}
+.btn-scan{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:12px;border:none;border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:.86rem;font-weight:500;color:#f5f0e8;cursor:pointer;touch-action:manipulation;-webkit-appearance:none;margin-top:10px;transition:background .15s}
+.btn-scan.blue{background:var(--blue)}.btn-scan.blue:active{background:#3a5e78}
+.btn-scan.green{background:var(--green)}.btn-scan.green:active{background:#3a6a3e}
+.btn-scan:disabled{background:var(--line)!important;color:var(--muted);cursor:not-allowed}
+.smsg{margin-top:8px;padding:8px 10px;border-radius:4px;font-size:.74rem;display:none}
+.smsg.loading{display:flex;align-items:center;gap:8px;background:#e8f0f7;color:var(--blue)}
+.smsg.ok{display:block;background:#e8f5e8;color:var(--green)}
+.smsg.err{display:block;background:#fdecea;color:#8b2a2a}
+.spinner{width:14px;height:14px;border:2px solid #b0c8d8;border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.settings{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin:14px 0;padding:13px 12px;background:var(--dark);border-radius:4px;border:1px solid var(--line)}
+.si{display:flex;align-items:center;gap:7px;font-size:.79rem;color:var(--ink)}
+.si.wide{grid-column:1/-1}
+.si label{cursor:pointer}
+input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;flex-shrink:0;cursor:pointer}
+.ai-bar{display:none;padding:8px 12px;background:#fdf5e0;border:1px solid #e6c87a;border-radius:4px;font-size:.74rem;color:#7a5a1a;margin-bottom:10px;align-items:center;gap:8px}
+.ai-bar.on{display:flex}
+.stats{display:flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;margin-bottom:12px}
+.stat{flex:1;display:flex;flex-direction:column;align-items:center;padding:9px 4px;border-right:1px solid var(--line)}
+.stat:last-child{border-right:none}
+.stat-n{font-family:'Noto Serif JP',serif;font-size:1.3rem;font-weight:600;color:var(--red);line-height:1}
+.stat-l{font-size:.6rem;color:var(--muted);margin-top:3px;text-align:center}
+.dup-sec{margin-bottom:14px}
+.dup-sec h3{font-size:.73rem;font-weight:500;color:var(--muted);margin-bottom:6px}
+.dup-item{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;background:#fff3cd;border-left:3px solid #e6a817;border-radius:0 3px 3px 0;margin-bottom:5px;font-size:.75rem}
+.dup-badge{background:#e6a817;color:#fff;padding:1px 6px;border-radius:10px;font-size:.63rem;white-space:nowrap;flex-shrink:0;margin-top:1px}
+.dup-names{color:var(--ink);line-height:1.6;word-break:break-all}
+.ctrls{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.swrap{position:relative}
+.sicon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+#searchInput{width:100%;padding:10px 12px 10px 32px;border:1px solid var(--line);border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:.86rem;background:#faf7f2;color:var(--ink);outline:none;-webkit-appearance:none}
+#searchInput:focus{border-color:var(--red2)}
+.ctrl-row{display:flex;gap:8px;align-items:center}
+.sort-wrap{display:flex;align-items:center;gap:5px}
+.sort-wrap label{font-size:.7rem;color:var(--muted);white-space:nowrap}
+#sortSelect{font-size:.75rem;padding:7px 22px 7px 8px;border:1px solid var(--line);border-radius:4px;background:var(--paper);color:var(--ink);-webkit-appearance:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a6e62' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center;font-family:'Noto Sans JP',sans-serif}
+.fgrp{display:flex;gap:4px;margin-left:auto}
+.fbtn{padding:7px 9px;border:1px solid var(--line);background:var(--paper);color:var(--muted);border-radius:4px;font-size:.7rem;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;touch-action:manipulation;-webkit-appearance:none;transition:all .15s}
+.fbtn.on{background:var(--red);color:#f5f0e8;border-color:var(--red)}
+.lwrap{max-height:52vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.lwrap::-webkit-scrollbar{width:3px}
+.lwrap::-webkit-scrollbar-thumb{background:var(--line);border-radius:2px}
+.ghdr{font-family:'Noto Serif JP',serif;font-size:1.05rem;font-weight:600;color:var(--red);padding:10px 0 4px;border-bottom:1px solid var(--line);margin-bottom:2px;letter-spacing:.1em;position:sticky;top:0;background:var(--paper);z-index:2}
+.card{display:flex;align-items:center;padding:10px 6px;border-bottom:1px solid var(--line);gap:10px;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:background .1s}
+.card:active{background:rgba(139,58,42,.07)}
+.avatar{width:35px;height:35px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif JP',serif;font-size:.88rem;font-weight:600;color:#f5f0e8;flex-shrink:0}
+.cinfo{flex:1;min-width:0}
+.cname{font-size:.86rem;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.csub{font-size:.7rem;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag{padding:2px 6px;border-radius:10px;font-size:.6rem;border:1px solid;flex-shrink:0}
+.tag-co{border-color:#7a9e7e;color:#4a7a4e;background:#f0f7f0}
+.tag-pe{border-color:#7a8ea0;color:#4a6e88;background:#f0f4f8}
+.tag-ai{border-color:#a07a2a;color:#7a5a1a;background:#fdf5e0}
+.tag-work{border-color:#c47a3a;color:#8b4a1a;background:#fdf0e0}
+mark{background:#ffe082;color:inherit;border-radius:2px;padding:0 1px}
+.empty{text-align:center;padding:44px 20px;color:var(--muted)}
+.empty svg{margin-bottom:10px;opacity:.38}
+.empty p{font-size:.8rem;line-height:1.7}
+.divider{height:1px;background:var(--line);margin:14px 0}
+.exp-label{font-size:.7rem;color:var(--muted);margin-bottom:7px;font-weight:500}
+.exp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.exp-btn{padding:10px 4px;border:1px solid var(--line);background:var(--dark);border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:.7rem;color:var(--ink);cursor:pointer;text-align:center;touch-action:manipulation;-webkit-appearance:none;display:flex;flex-direction:column;align-items:center;gap:3px}
+.exp-btn:active{border-color:var(--red);color:var(--red)}
+.exp-icon{font-size:1.15rem;line-height:1}
+.btn-save{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:11px;background:var(--red);color:#f5f0e8;border:none;border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;touch-action:manipulation;-webkit-appearance:none;transition:background .15s}
+.btn-save:active{background:var(--red2)}
+.save-st{margin-top:6px;font-size:.72rem;color:var(--green);min-height:18px;text-align:center}
+.load-row{display:none;align-items:center;gap:8px;margin-top:8px;padding:9px 12px;background:#e8f5e8;border-radius:4px;border:1px solid #b0d4b0;flex-wrap:wrap}
+.load-row.on{display:flex}
+.load-info{font-size:.72rem;color:var(--green);flex:1;min-width:0}
+.btn-load{padding:6px 12px;background:var(--green);color:#fff;border:none;border-radius:3px;font-family:'Noto Sans JP',sans-serif;font-size:.72rem;cursor:pointer;touch-action:manipulation;white-space:nowrap}
+.btn-clr{padding:6px 10px;background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:3px;font-family:'Noto Sans JP',sans-serif;font-size:.7rem;cursor:pointer;touch-action:manipulation;white-space:nowrap}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:200;align-items:flex-end;justify-content:center}
+.overlay.on{display:flex}
+.dlmodal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+.dlmodal.on{display:flex}
+.dlbox{background:var(--paper);border-radius:10px;padding:22px 20px;width:100%;max-width:360px;text-align:center}
+.dlbox p{font-size:.82rem;color:var(--muted);margin-bottom:14px;line-height:1.7}
+.dllink{display:block;padding:13px;background:var(--red);color:#f5f0e8;border-radius:6px;font-size:.92rem;font-weight:500;text-decoration:none;margin-bottom:10px}
+.dlbox-cl{width:100%;padding:10px;background:transparent;border:1px solid var(--line);border-radius:6px;font-size:.82rem;color:var(--muted);cursor:pointer;font-family:'Noto Sans JP',sans-serif}
+.sheet{background:var(--paper);border-radius:16px 16px 0 0;padding:8px 20px calc(16px + var(--sb));width:100%;max-width:600px;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;position:relative;box-shadow:0 -4px 30px rgba(0,0,0,.25);animation:su .22s ease}
+@keyframes su{from{transform:translateY(50px);opacity:0}to{transform:translateY(0);opacity:1}}
+.shdl{width:36px;height:4px;background:var(--line);border-radius:2px;margin:10px auto 14px}
+.shcl{position:absolute;top:16px;right:16px;background:var(--dark);border:none;cursor:pointer;color:var(--muted);font-size:.9rem;padding:5px 10px;border-radius:20px;touch-action:manipulation}
+.shnm{font-family:'Noto Serif JP',serif;font-size:1.25rem;font-weight:600;color:var(--ink);margin-bottom:12px;padding-right:50px}
+.mf{display:flex;gap:10px;margin-bottom:8px;font-size:.82rem}
+.mf-l{color:var(--muted);width:55px;flex-shrink:0;font-size:.73rem;padding-top:1px}
+.mf-v{color:var(--ink);word-break:break-all}
+.edit{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.edit label{font-size:.7rem;color:var(--muted);display:block;margin-bottom:4px}
+.edit input{width:100%;padding:10px;border:1px solid var(--line);border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:.86rem;background:#faf7f2;color:var(--ink);outline:none;margin-bottom:10px;-webkit-appearance:none}
+.edit input:focus{border-color:var(--red2)}
+.shact{display:flex;gap:8px;margin-top:4px}
+.sh-save{flex:2;padding:12px;background:var(--red);color:#f5f0e8;border:none;border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:.86rem;font-weight:500;cursor:pointer;touch-action:manipulation;-webkit-appearance:none}
+.sh-del{flex:1;padding:12px;background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:.78rem;cursor:pointer;touch-action:manipulation;-webkit-appearance:none}
+@media(min-width:600px){
+  body{padding:28px 16px}
+  .book::before{width:28px}
+  .inner{margin-left:28px;padding:32px 32px 32px 26px}
+  header h1{font-size:1.6rem}
+  .settings{display:flex;flex-wrap:wrap;gap:14px 20px}
+  .si.wide{width:auto}
+  .btn-p{width:auto;padding:11px 28px;margin-top:0}
+  .btn-row{margin-top:0}
+  .ctrls{flex-direction:row;flex-wrap:wrap;align-items:center}
+  .swrap{flex:1;min-width:200px}
+  .ctrl-row{flex:none}
+  .lwrap{max-height:460px}
+  .overlay{align-items:center}
+  .sheet{border-radius:8px;padding-bottom:24px}
+  .shdl{display:none}
+  .exp-grid{grid-template-columns:repeat(4,auto);justify-content:start;gap:8px}
+  .exp-btn{padding:8px 14px;font-size:.76rem;flex-direction:row}
+}
+</style>
+</head>
+<body>
+<div class="book"><div class="inner">
+<header>
+  <h1>連 絡 帳 整 頓 ツ ー ル</h1>
+  <div class="subtitle">重複削除・企業名統一・AI会社判定・名前順/会社名順</div>
+</header>
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('input',this)">① データ入力</button>
+  <button class="tab" onclick="switchTab('result',this)">② 整頓済み一覧</button>
+</div>
+
+<div class="panel on" id="panelInput">
+  <div class="itabs">
+    <button class="itab on" onclick="switchIMode('Text',this)">✏️ テキスト</button>
+    <button class="itab" onclick="switchIMode('Csv',this)">📄 CSV</button>
+    <button class="itab" onclick="switchIMode('Vcf',this)">👤 VCF</button>
+    <button class="itab" onclick="switchIMode('Image',this)">📷 画像</button>
+  </div>
+  <div class="imode on" id="imodeText">
+    <div class="guide">1行1件で貼り付け。スペース・カンマ・タブ区切り対応。</div>
+    <textarea id="inputData" placeholder="山田 花子 株式会社ABC 03-1234-5678&#10;鈴木商店 090-9999-0000&#10;田中さん 080-1111-2222"></textarea>
+    <div class="btn-row">
+      <button class="btn-s" onclick="loadSample()">サンプル</button>
+      <button class="btn-s" onclick="document.getElementById('inputData').value=''">クリア</button>
+    </div>
+  </div>
+  <div class="imode" id="imodeCsv">
+    <div class="guide">CSVを読み込み。列を自動検出。UTF-8・Shift-JIS自動判定。</div>
+    <label class="fzone"><input type="file" accept=".csv,.tsv,text/csv" onchange="onCsvFile(this)">
+      <div class="fz-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+      <div class="fz-text"><strong>タップしてCSVを選択</strong><br>UTF-8 / Shift-JIS 自動判定</div>
+    </label>
+    <div id="csvMapping" style="display:none">
+      <div class="csv-info" id="csvInfo"></div>
+      <div class="map-title">列の割り当て確認</div>
+      <div class="map-grid" id="mapGrid"></div>
+      <div class="map-title">プレビュー（先頭3件）</div>
+      <div class="csv-prev" id="csvPrev"></div>
+      <button class="btn-scan green" onclick="importCsv()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>このCSVを取り込む</button>
+      <div class="smsg" id="csvStatus"></div>
+    </div>
+  </div>
+  <div class="imode" id="imodeVcf">
+    <div class="guide">iPhoneの連絡先アプリからエクスポートした.vcfを読み込みます。</div>
+    <label class="fzone"><input type="file" accept=".vcf,text/vcard,text/x-vcard" multiple onchange="onVcfFile(this)">
+      <div class="fz-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <div class="fz-text"><strong>タップしてVCFを選択</strong><br>複数ファイル・複数連絡先入りVCF対応</div>
+    </label>
+    <div class="smsg" id="vcfStatus"></div>
+  </div>
+  <div class="imode" id="imodeImage">
+    <div class="guide">名刺・連絡帳・スクリーンショットをAIが読み取りテキスト変換。複数枚OK。</div>
+    <label class="fzone"><input type="file" accept="image/*" multiple onchange="onImgFiles(this)">
+      <div class="fz-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div>
+      <div class="fz-text"><strong>タップして画像を選択</strong><br>カメラ撮影・アルバム両対応</div>
+    </label>
+    <div class="thumbs" id="thumbs"></div>
+    <button class="btn-scan blue" id="btnScan" onclick="scanImages()" disabled><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/></svg>AIで連絡先を読み取る</button>
+    <div class="smsg" id="scanStatus"></div>
+  </div>
+  <div class="settings">
+    <div class="si"><input type="checkbox" id="chkDup" checked><label for="chkDup">重複を削除</label></div>
+    <div class="si"><input type="checkbox" id="chkCo" checked><label for="chkCo">企業名の位置を統一</label></div>
+    <div class="si wide">
+      <label for="selPos" style="white-space:nowrap">企業名の位置：</label>
+      <select id="selPos" class="msel" style="width:auto"><option value="after">名前の後ろ</option><option value="before">名前の前</option></select>
+    </div>
+    <div class="si wide"><input type="checkbox" id="chkAI" checked><label for="chkAI">AIで会社・個人を自動判定（法人格のない店名・屋号なども検出）</label></div>
+  </div>
+  <button class="btn-p" id="btnProcess" onclick="processContacts()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    整 頓 す る
+  </button>
+</div>
+
+<div class="panel" id="panelResult">
+  <div class="ai-bar" id="aiBar"><div class="spinner" style="border-top-color:#a07a2a;border-color:#e6c87a"></div><span id="aiBarMsg">AIで判定中…</span></div>
+  <div class="stats" id="statsBar" style="display:none">
+    <div class="stat"><span class="stat-n" id="sTotal">0</span><span class="stat-l">件（整頓後）</span></div>
+    <div class="stat"><span class="stat-n" id="sRemoved">0</span><span class="stat-l">重複削除</span></div>
+    <div class="stat"><span class="stat-n" id="sFixed">0</span><span class="stat-l">企業名修正</span></div>
+    <div class="stat"><span class="stat-n" id="sAI">0</span><span class="stat-l">AI判定</span></div>
+  </div>
+  <div class="dup-sec" id="dupSec" style="display:none"><h3>▸ 削除された重複</h3><div id="dupList"></div></div>
+  <div class="ctrls">
+    <div class="swrap">
+      <svg class="sicon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="search" id="searchInput" placeholder="名前・会社・電話・メールで検索…" oninput="renderList()" autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="ctrl-row">
+      <div class="sort-wrap"><label>並び順：</label><select id="sortSelect" onchange="renderList()"><option value="name">名前順</option><option value="company">会社名順</option><option value="none">元の順</option></select></div>
+    </div>
+  </div>
+  <div class="lwrap"><div id="contactList">
+    <div class="empty"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><p>「① データ入力」で連絡先を入力し<br>「整頓する」を押してください</p></div>
+  </div></div>
+  <div class="divider" id="expDiv" style="display:none"></div>
+  <div id="expSec" style="display:none">
+    <div class="exp-label">💾 保存・エクスポート</div>
+    <div class="exp-grid">
+      <button class="exp-btn" onclick="exportCSV()"><span class="exp-icon">📊</span>CSV</button>
+      <button class="exp-btn" onclick="exportTSV()"><span class="exp-icon">📋</span>TSV</button>
+      <button class="exp-btn" onclick="exportText()"><span class="exp-icon">📝</span>テキスト</button>
+      <button class="exp-btn" onclick="exportVCF()"><span class="exp-icon">👤</span>VCF</button>
+    </div>
+    <button class="btn-save" onclick="saveLocal()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>このブラウザに保存（次回も読み込める）</button>
+    <div class="save-st" id="saveSt"></div>
+    <div class="load-row" id="loadRow"><span class="load-info" id="loadInfo"></span><button class="btn-load" onclick="loadLocal()">前回を読み込む</button><button class="btn-clr" onclick="clearLocal()">削除</button></div>
+  </div>
+</div>
+</div></div>
+
+<div class="dlmodal" id="dlModal" onclick="if(event.target===this)closeDlModal()">
+  <div class="dlbox">
+    <p id="dlMsg">リンクをタップしてファイルを開いてください</p>
+    <a id="dlLink" class="dllink" href="#" target="_blank" rel="noopener"></a>
+    <button class="dlbox-cl" onclick="closeDlModal()">閉じる</button>
+  </div>
+</div>
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeSheet()">
+  <div class="sheet" id="sheet">
+    <div class="shdl"></div>
+    <button class="shcl" onclick="closeSheet()">✕</button>
+    <div class="shnm" id="shName"></div>
+    <div id="shFields"></div>
+    <div class="edit">
+      <label>名前</label><input type="text" id="eName" inputmode="text">
+      <label>会社名</label><input type="text" id="eCo" inputmode="text">
+      <label>電話番号</label><input type="tel" id="eTel" inputmode="tel">
+      <label>メール</label><input type="email" id="eMail" inputmode="email">
+      <div class="shact"><button class="sh-save" onclick="saveEdit()">保存</button><button class="sh-del" onclick="deleteContact()">削除</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var contacts=[],editIdx=-1,removedDups=[],fixedCnt=0,aiCnt=0;
+var STORE='renrakucho_v2';
+var CORP=['株式会社','有限会社','合同会社','合名会社','合資会社','一般社団法人','公益社団法人','一般財団法人','公益財団法人','社会福祉法人','特定非営利活動法人','NPO法人','学校法人','医療法人','農業協同組合','協同組合','事業協同組合','信用金庫','信用組合'];
+
+/* ── ユーティリティ ── */
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function show(id){var e=document.getElementById(id);if(e)e.style.display='';}
+function setMsg(id,cls,msg){var e=document.getElementById(id);if(!e)return;e.className='smsg'+(cls?' '+cls:'');e.innerHTML=cls==='loading'?'<div class="spinner"></div>'+esc(msg):esc(msg);}
+function hiragana(s){return (s||'').replace(/[\u30a1-\u30f6]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0x60);});}
+
+/* ── タブ ── */
+function switchTab(tab,btn){
+  document.querySelectorAll('.tab').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  document.getElementById('panelInput').classList.toggle('on',tab==='input');
+  document.getElementById('panelResult').classList.toggle('on',tab==='result');
+}
+function switchIMode(mode,btn){
+  document.querySelectorAll('.itab').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  document.querySelectorAll('.imode').forEach(function(e){e.classList.remove('on');});
+  document.getElementById('imode'+mode).classList.add('on');
+}
+
+/* ── 解析 ── */
+function parseLine(line){
+  line=line.trim();if(!line)return null;
+  var toks=line.split(/[\s\t,;，；\u3000]+/).filter(function(t){return t;});
+  var name='',company='',phone='',email='',others=[];
+  toks.forEach(function(t){
+    if(/^[\w.+\-]+@[\w\-]+\.[\w.]+$/.test(t))email=t;
+    else if(isPhone(t))phone=normPhone(t);
+    else if(isCorpTok(t))company=company?company+' '+t:t;
+    else others.push(t);
+  });
+  // 「○○さん 田園防水」のように敬称付き人名と会社名が混在している場合を分離
+  if(!company&&others.length>=2){
+    var hRe=/(さん|様|くん|ちゃん|氏)$/;
+    for(var i=0;i<others.length;i++){
+      if(hRe.test(others[i])){
+        name=others[i]; // 敬称はそのまま保持
+        company=others.filter(function(_,j){return j!==i;}).join(' ');
+        break;
+      }
+    }
+  }
+  if(!name)name=others.join(' ').trim();
+  return {name:name.trim(),company:company.trim(),phone:phone,email:email,raw:line,aiTagged:false};
+}
+function isPhone(t){var n=t.replace(/[０-９]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0xFEE0);}).replace(/[ー－]/g,'-');return /^\+?[\d][\d\-]{6,}$/.test(n);}
+function normPhone(t){return t.replace(/[０-９]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0xFEE0);}).replace(/[ー－]/g,'-');}
+function isCorpTok(t){return CORP.some(function(s){return (t.endsWith(s)&&t.length>s.length)||(t.startsWith(s)&&t.length>s.length);});}
+function corpCore(name){
+  name=(name||'').trim();
+  for(var i=0;i<CORP.length;i++){var s=CORP[i];if(name.endsWith(s))return{core:name.slice(0,-s.length).trim(),sfx:s};if(name.startsWith(s))return{core:name.slice(s.length).trim(),sfx:s};}
+  return{core:name,sfx:''};
+}
+function normCorpKey(n){var r=corpCore(n);return r.sfx?r.sfx+r.core:n;}
+function reformatCorp(n,pos){var r=corpCore(n);if(!r.sfx)return n;return pos==='before'?r.sfx+r.core:r.core+r.sfx;}
+
+/* ── 確実な人名判定（AIスキップ対象） ── */
+function isDefinitelyPerson(name){
+  if(!name)return false;
+  // 敬称で終わるもの
+  if(/(さん|様|くん|ちゃん|氏|先生|部長|課長|社長|専務|常務|取締役|代表|院長|所長|先輩|後輩)$/.test(name))return true;
+  // 「姓 名」スペース区切りで各部分が漢字1〜4文字 → 典型的な人名
+  if(/^[\u4E00-\u9FFF]{1,4}[\s\u3000][\u4E00-\u9FFF\u3040-\u309F]{1,4}$/.test(name))return true;
+  // ひらがなのみ（読み仮名）
+  if(/^[\u3040-\u309F]{2,8}$/.test(name))return true;
+  // 敬称が途中に含まれる場合（「田園さん 田園防水」のように未分離の場合）はAIへ
+  // → parseLine の分離ロジックが先に動くため、ここには来ないはずだが安全のため false を返す
+  return false;
+}
+
+/* ── AI会社判定・仕事/個人分類 ── */
+async function aiClassify(cs){
+  // 全件を対象（会社判定：未判定のもの、仕事判定：全件）
+  var targets=[];
+  cs.forEach(function(c,i){
+    if(c.name||c.company)targets.push({
+      idx:i,
+      label:c.company?(c.name?c.name+' '+c.company:c.company):c.name,
+      // 敬称付き（さん・様等）またはひらがなのみ → 人名確定でAIスキップ
+      // それ以外（漢字のみ・カタカナ・アルファベット・スペース区切り漢字等）→ 全てAIで確認
+      needsClassify:!c.company&&!!c.name&&!/(さん|様|くん|ちゃん|氏|先生|部長|課長|社長|専務|常務|取締役|代表|院長|所長|先輩|後輩)$/.test(c.name)&&!/^[\u3040-\u309F]{2,8}$/.test(c.name)
+    });
+  });
+  if(!targets.length)return 0;
+  document.getElementById('aiBarMsg').textContent='AIで'+targets.length+'件を判定中…';
+  document.getElementById('aiBar').classList.add('on');
+  var prompt='あなたは建築業界に精通したアシスタントです。\n'
+    +'以下のリストの各項目を解析し、JSON配列で返してください。\n\n'
+    +'各項目の判定パターン（needsClassify=trueの項目のみ会社/人名判定を行う）:\n'
+    +'・会社・店舗・組織名のみ → {"isCompany":true,"companyName":"会社名","workRelated":true|false}\n'
+    +'・人名のみ → {"isCompany":false,"workRelated":true|false}\n'
+    +'・人名と会社名が混在（例:「田園さん 田園防水」）→ {"isCompany":false,"hasBoth":true,"personName":"田園さん","companyName":"田園防水","workRelated":true|false}\n\n'
+    +'判定ルール:\n'
+    +'・末尾に「さん」「様」等の敬称 → 人名（敬称はそのまま）\n'
+    +'・「姓 名」形式の漢字2語 → 人名\n'
+    +'・店名・屋号・施設・団体名 → 会社\n'
+    +'・「○○さん △△商店」のように人名＋店名 → hasBoth:true\n'
+    +'・判断が難しければ会社寄りに判定\n'
+    +'・workRelated: 建築・工務・設計・建設・土木・不動産・内装・塗装・防水・左官・板金・電気・設備・管工事・リフォーム・解体・測量・造園・資材・ハウスメーカー等に関係する場合 true\n\n'
+    +'JSONのみ返す（コードブロック不要）:\n'
+    +'[{"isCompany":true,"companyName":"会社名","workRelated":true},...]\n\n'
+    +'リスト:\n'+targets.map(function(t,i){return (i+1)+'. '+t.label+(t.needsClassify?'':' [既分類]');}).join('\n');
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1200,messages:[{role:'user',content:prompt}]})});
+    if(!res.ok)throw new Error('API '+res.status);
+    var data=await res.json();
+    var text=(data.content||[]).map(function(b){return b.text||'';}).join('').trim();
+    var clean=text.replace(/```json|```/g,'').trim();
+    var arr=JSON.parse(clean);
+    var cnt=0;
+    arr.forEach(function(item,j){
+      if(j>=targets.length)return;
+      var ci=targets[j].idx;
+      // workRelated は全件に適用
+      if(item.workRelated===true||item.workRelated===false)cs[ci].workRelated=item.workRelated;
+      // 会社/人名判定は needsClassify のものだけ
+      if(targets[j].needsClassify){
+        if(item.hasBoth&&item.personName&&item.companyName){
+          cs[ci].name=item.personName;
+          cs[ci].company=item.companyName;
+          cs[ci].aiTagged=true;cnt++;
+        }else if(item.isCompany){
+          cs[ci].company=item.companyName||cs[ci].name;
+          cs[ci].name='';
+          cs[ci].aiTagged=true;cnt++;
+        }
+      }
+    });
+    return cnt;
+  }catch(e){console.warn('AI classify error:',e);return 0;}
+  finally{document.getElementById('aiBar').classList.remove('on');}
+}
+
+/* ── メイン処理 ── */
+async function processContacts(){
+  var raw=document.getElementById('inputData').value.trim();
+  if(!raw){alert('データを入力してください');return;}
+  var doDup=document.getElementById('chkDup').checked;
+  var doCo=document.getElementById('chkCo').checked;
+  var pos=document.getElementById('selPos').value;
+  var doAI=document.getElementById('chkAI').checked;
+  var btn=document.getElementById('btnProcess');
+  btn.textContent='処理中…';btn.disabled=true;
+
+  var lines=raw.split('\n').map(function(l){return l.trim();}).filter(function(l){return l;});
+  var cs=lines.map(parseLine).filter(Boolean);
+
+  aiCnt=0;
+  if(doAI&&cs.length){btn.textContent='AIで判定中…';aiCnt=await aiClassify(cs);}
+
+  fixedCnt=0;
+  if(doCo)cs=cs.map(function(c){if(!c.company)return c;var r=reformatCorp(c.company,pos);if(r!==c.company)fixedCnt++;return Object.assign({},c,{company:r});});
+
+  removedDups=[];
+  if(doDup){
+    var unique=[],dupMap=new Map();
+    cs.forEach(function(c){
+      var nN=c.name.replace(/[\s\u3000]/g,''),nCo=normCorpKey(c.company).replace(/[\s\u3000]/g,''),nP=c.phone.replace(/[-\(\)\s]/g,''),nE=c.email.toLowerCase().trim();
+      var found=-1;
+      for(var i=0;i<unique.length;i++){
+        var u=unique[i],uN=u.name.replace(/[\s\u3000]/g,''),uCo=normCorpKey(u.company).replace(/[\s\u3000]/g,''),uP=u.phone.replace(/[-\(\)\s]/g,''),uE=u.email.toLowerCase().trim();
+        if((nP&&uP&&nP===uP)||(nE&&uE&&nE===uE)||(nN&&uN&&nN===uN&&nCo&&uCo&&nCo===uCo)||(nN===uN&&nCo===uCo&&nP===uP&&nE===uE)){found=i;break;}
+      }
+      if(found>=0){var u=unique[found];unique[found]=Object.assign({},u,{name:u.name||c.name,company:u.company||c.company,phone:u.phone||c.phone,email:u.email||c.email});if(!dupMap.has(found))dupMap.set(found,[u.raw]);dupMap.get(found).push(c.raw);}
+      else unique.push(c);
+    });
+    dupMap.forEach(function(raws){if(raws.length>1)removedDups.push(raws);});
+    cs=unique;
+  }
+
+  contacts=cs;
+  btn.textContent='整 頓 す る';btn.disabled=false;
+  updateStats();renderDups();renderList();
+  show('statsBar');show('expDiv');show('expSec');
+  document.querySelectorAll('.tab')[1].click();
+}
+
+/* ── ソート ── */
+function sortedCs(cs,mode){
+  if(mode==='none')return cs.slice();
+  return cs.slice().sort(function(a,b){
+    if(mode==='name')return hiragana(a.name).localeCompare(hiragana(b.name),'ja');
+    if(mode==='company'){
+      if(!a.company&&!b.company)return hiragana(a.name).localeCompare(hiragana(b.name),'ja');
+      if(!a.company)return 1;if(!b.company)return -1;
+      var ca=hiragana(corpCore(a.company).core),cb=hiragana(corpCore(b.company).core),d=ca.localeCompare(cb,'ja');
+      return d!==0?d:hiragana(a.name).localeCompare(hiragana(b.name),'ja');
+    }
+    return 0;
+  });
+}
+function groupCh(str,mode){
+  var s=mode==='company'?corpCore(str||'').core:(str||'');if(!s)return '（なし）';
+  var h=hiragana(s[0]),code=h.charCodeAt(0);
+  var rows=[['あ',0x3041,0x3046],['か',0x304B,0x3053],['さ',0x3055,0x305C],['た',0x305F,0x3069],['な',0x306A,0x306E],['は',0x306F,0x307B],['ま',0x307E,0x3082],['や',0x3084,0x3088],['ら',0x3089,0x308D],['わ',0x308F,0x3093]];
+  for(var i=0;i<rows.length;i++){if(code>=rows[i][1]&&code<=rows[i][2])return rows[i][0];}
+  if(/[a-zA-Zａ-ｚＡ-Ｚ]/.test(s[0]))return 'A–Z';
+  if(/[0-9０-９]/.test(s[0]))return '数字';
+  return s[0]||'他';
+}
+
+/* ── 描画 ── */
+function renderList(){
+  var el=document.getElementById('contactList');
+  var mode=document.getElementById('sortSelect').value;
+  var q=(document.getElementById('searchInput').value||'').trim().toLowerCase();
+  var cs=contacts.filter(function(c){
+    if(!q)return true;
+    return (c.name+c.company+c.phone+c.email).toLowerCase().indexOf(q)>=0;
+  });
+  if(!cs.length){el.innerHTML='<div class="empty"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><p>該当なし</p></div>';return;}
+  var sc=sortedCs(cs,mode),html='',lastG=null;
+  sc.forEach(function(c){
+    var gkey=mode==='company'?c.company:c.name,g=mode!=='none'?groupCh(gkey,mode):null;
+    if(g&&g!==lastG){html+='<div class="ghdr">'+esc(g)+'</div>';lastG=g;}
+    var ri=contacts.indexOf(c);
+    var hl=function(t){if(!t||!q)return esc(t||'');return esc(t).replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),function(m){return '<mark>'+m+'</mark>';});};
+    // 会社名・人名を横並びでメイン行に、電話・メールをサブ行に
+    var av=c.company?(corpCore(c.company).core[0]||c.company[0]||'?'):(c.name[0]||'?');
+    var mainParts=[c.company?hl(c.company):null,c.name?hl(c.name):null].filter(Boolean);
+    var mainText=mainParts.join('　')||(c.company||c.name?'':'（名前なし）');
+    var sub=[hl(c.phone),hl(c.email)].filter(Boolean).join('　');
+    // タグ：AI判定済みのみバッジ表示、それ以外はタグなし
+    var tag=c.aiTagged?'<span class="tag tag-ai">AI判定</span>':'';
+    html+='<div class="card" onclick="openSheet('+ri+')"><div class="avatar" style="background:'+acolor(c.company||c.name)+'">'+esc(av)+'</div><div class="cinfo"><div class="cname">'+mainText+'</div>'+(sub?'<div class="csub">'+sub+'</div>':'')+'</div>'+tag+'</div>';
+  });
+  el.innerHTML=html;
+}
+function acolor(n){if(!n)return '#8b3a2a';var C=['#8b3a2a','#4a7a4e','#4a6e88','#7a5a2a','#6a4a7a','#2a6a6a'],h=0;for(var i=0;i<n.length;i++)h=(h*31+n.charCodeAt(i))%C.length;return C[Math.abs(h)%C.length];}
+function updateStats(){document.getElementById('sTotal').textContent=contacts.length;document.getElementById('sRemoved').textContent=removedDups.reduce(function(s,d){return s+d.length-1;},0);document.getElementById('sFixed').textContent=fixedCnt;document.getElementById('sAI').textContent=aiCnt;}
+function renderDups(){var sec=document.getElementById('dupSec'),el=document.getElementById('dupList');if(!removedDups.length){sec.style.display='none';return;}sec.style.display='block';el.innerHTML=removedDups.map(function(g){return '<div class="dup-item"><span class="dup-badge">'+g.length+'件</span><span class="dup-names">'+g.map(esc).join('<br>')+'</span></div>';}).join('');}
+
+/* ── モーダル ── */
+function openSheet(i){editIdx=i;var c=contacts[i];document.getElementById('shName').textContent=c.name||c.company||'（不明）';var flds=[['会社',c.company],['電話',c.phone],['メール',c.email]].filter(function(f){return f[1];});document.getElementById('shFields').innerHTML=flds.map(function(f){return '<div class="mf"><span class="mf-l">'+f[0]+'</span><span class="mf-v">'+esc(f[1])+'</span></div>';}).join('');document.getElementById('eName').value=c.name;document.getElementById('eCo').value=c.company;document.getElementById('eTel').value=c.phone;document.getElementById('eMail').value=c.email;document.getElementById('overlay').classList.add('on');document.body.style.overflow='hidden';}
+function closeSheet(){document.getElementById('overlay').classList.remove('on');document.body.style.overflow='';}
+function saveEdit(){if(editIdx<0)return;contacts[editIdx]=Object.assign({},contacts[editIdx],{name:document.getElementById('eName').value.trim(),company:document.getElementById('eCo').value.trim(),phone:document.getElementById('eTel').value.trim(),email:document.getElementById('eMail').value.trim()});closeSheet();renderList();updateStats();}
+function deleteContact(){if(editIdx<0)return;if(!confirm('削除しますか？'))return;contacts.splice(editIdx,1);closeSheet();renderList();updateStats();}
+
+/* ── CSV ── */
+var csvH=[],csvR=[],csvMap={name:'',company:'',phone:'',email:''};
+function onCsvFile(input){var file=input.files[0];if(!file)return;input.value='';readText(file).then(function(text){var p=parseCsv(text);if(!p.rows.length){alert('有効なデータが見つかりません');return;}csvH=p.headers;csvR=p.rows;csvMap={name:'',company:'',phone:'',email:''};csvH.forEach(function(h,i){var r=guessRole(h);if(r&&!csvMap[r])csvMap[r]=String(i);});document.getElementById('csvInfo').textContent='📄 '+file.name+'　'+csvR.length+'行 × '+csvH.length+'列';renderMapGrid();renderCsvPrev();document.getElementById('csvMapping').style.display='block';setMsg('csvStatus','','');}).catch(function(e){alert('読み込み失敗: '+e.message);});}
+function readText(file){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(e){var t=e.target.result;if((t.match(/\uFFFD/g)||[]).length>3){var r2=new FileReader();r2.onload=function(e2){res(e2.target.result);};r2.onerror=rej;r2.readAsText(file,'Shift_JIS');}else res(t);};r.onerror=rej;r.readAsText(file,'UTF-8');});}
+function parseCsv(text){var lines=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').filter(function(l){return l.trim();});if(!lines.length)return{headers:[],rows:[]};var parse=function(line){var out=[],cur='',inQ=false;for(var i=0;i<line.length;i++){var c=line[i];if(c==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}else if((c===','||c==='\t')&&!inQ){out.push(cur.trim());cur='';}else cur+=c;}out.push(cur.trim());return out;};var first=parse(lines[0]);var isHdr=first.every(function(v){return !/^[\d\-\+\(\)]{6,}$/.test(v)&&!/@/.test(v);});return isHdr?{headers:first,rows:lines.slice(1).map(parse)}:{headers:first.map(function(_,i){return '列'+(i+1);}),rows:lines.map(parse)};}
+function guessRole(h){var l=h.toLowerCase();if(/名前|氏名|name|姓名|ふりがな/.test(l))return 'name';if(/会社|企業|組織|company|org|勤務先/.test(l))return 'company';if(/電話|tel|phone|携帯|mobile|fax/.test(l))return 'phone';if(/mail|email|メール/.test(l))return 'email';return '';}
+function renderMapGrid(){var opts='<option value="">（使わない）</option>'+csvH.map(function(h,i){return '<option value="'+i+'">'+esc(h)+'</option>';}).join('');var roles=[['name','名前列'],['company','会社名列'],['phone','電話列'],['email','メール列']];document.getElementById('mapGrid').innerHTML=roles.map(function(r){return '<div class="map-item"><label>'+r[1]+'</label><select class="msel" onchange="csvMap[\''+r[0]+'\']=this.value;renderCsvPrev()">'+opts.replace('value="'+csvMap[r[0]]+'"','value="'+csvMap[r[0]]+'" selected')+'</select></div>';}).join('');}
+function renderCsvPrev(){var el=document.getElementById('csvPrev');var active=['name','company','phone','email'].filter(function(k){return csvMap[k]!=='';});var lbl={name:'名前',company:'会社名',phone:'電話',email:'メール'};if(!active.length){el.innerHTML='';return;}var th=active.map(function(k){return '<th>'+lbl[k]+'</th>';}).join('');var tb=csvR.slice(0,3).map(function(row){return '<tr>'+active.map(function(k){return '<td>'+esc(row[+csvMap[k]]||'')+'</td>';}).join('')+'</tr>';}).join('');el.innerHTML='<table><thead><tr>'+th+'</tr></thead><tbody>'+tb+'</tbody></table>';}
+function importCsv(){var lines=csvR.map(function(row){return ['name','company','phone','email'].map(function(k){return csvMap[k]!==''?(row[+csvMap[k]]||'').trim():'';}).filter(Boolean).join(' ');}).filter(function(l){return l.trim();});if(!lines.length){setMsg('csvStatus','err','⚠ 取り込めるデータがありません');return;}var ex=document.getElementById('inputData').value.trim();document.getElementById('inputData').value=[ex].concat(lines).filter(Boolean).join('\n');setMsg('csvStatus','ok','✓ '+lines.length+'件を取り込みました');setTimeout(function(){document.querySelectorAll('.itab')[0].click();},900);}
+
+/* ── VCF読み込み ── */
+function onVcfFile(input){var files=Array.from(input.files);if(!files.length)return;input.value='';setMsg('vcfStatus','loading',files.length+'件を読み込み中…');Promise.all(files.map(readText)).then(function(texts){var parsed=parseVcf(texts.join('\n'));if(!parsed.length){setMsg('vcfStatus','err','⚠ 連絡先が見つかりませんでした');return;}var lines=parsed.map(function(c){return [c.name,c.company,c.phone,c.email].filter(Boolean).join(' ');});var ex=document.getElementById('inputData').value.trim();document.getElementById('inputData').value=[ex].concat(lines).filter(Boolean).join('\n');setMsg('vcfStatus','ok','✓ '+parsed.length+'件を取り込みました');setTimeout(function(){document.querySelectorAll('.itab')[0].click();},900);}).catch(function(e){setMsg('vcfStatus','err','⚠ 読み込み失敗: '+e.message);});}
+function parseVcf(text){text=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').replace(/\n[ \t]/g,'');var cards=[],blocks=text.split(/BEGIN:VCARD/i).slice(1);blocks.forEach(function(block){var lines=block.split('\n');var get=function(prop){for(var i=0;i<lines.length;i++){var u=lines[i].toUpperCase();if(u.startsWith(prop+':')||u.startsWith(prop+';')){return decodeVcfVal(lines[i].split(':').slice(1).join(':').trim());}}return '';};var name=get('FN');if(!name){var n=get('N');if(n){var pts=n.split(';').map(decodeVcfVal).filter(Boolean);name=pts.slice(0,2).join(' ').trim();}}var company=get('ORG').replace(/;.*/,'').trim();var phone='',email='';lines.forEach(function(l){if(!phone&&l.toUpperCase().startsWith('TEL')){phone=l.split(':').slice(1).join(':').trim().replace(/[^\d\+\-\(\)]/g,'');}});lines.forEach(function(l){if(!email&&l.toUpperCase().startsWith('EMAIL')){email=decodeVcfVal(l.split(':').slice(1).join(':').trim());}});if(name||company||phone||email)cards.push({name:name,company:company,phone:phone,email:email,raw:[name,company,phone,email].filter(Boolean).join(' ')});});return cards;}
+function decodeVcfVal(v){v=(v||'').replace(/=([0-9A-Fa-f]{2})/g,function(_,h){return String.fromCharCode(parseInt(h,16));});return v.replace(/\\n/gi,'\n').replace(/\\,/g,',').replace(/\\;/g,';').replace(/\\\\/g,'\\').trim();}
+
+/* ── 画像AI読み取り ── */
+var imgs=[];
+function onImgFiles(input){Array.from(input.files).forEach(function(f){if(!f.type.startsWith('image/'))return;var r=new FileReader();r.onload=function(e){imgs.push({dataUrl:e.target.result});renderThumbs();};r.readAsDataURL(f);});input.value='';}
+function renderThumbs(){document.getElementById('thumbs').innerHTML=imgs.map(function(img,i){return '<div class="thumb"><img src="'+img.dataUrl+'"><button class="thumb-rm" onclick="imgs.splice('+i+',1);renderThumbs()">✕</button></div>';}).join('');document.getElementById('btnScan').disabled=imgs.length===0;}
+async function scanImages(){if(!imgs.length)return;var btn=document.getElementById('btnScan');btn.disabled=true;setMsg('scanStatus','loading','AIが読み取り中…');try{var results=[];for(var i=0;i<imgs.length;i++){setMsg('scanStatus','loading',(i+1)+'/'+imgs.length+'枚目を読み取り中…');var t=await extractFromImg(imgs[i].dataUrl);if(t)results.push(t);}if(!results.length)throw new Error('連絡先を検出できませんでした');var ex=document.getElementById('inputData').value.trim();document.getElementById('inputData').value=[ex].concat(results).filter(Boolean).join('\n');setMsg('scanStatus','ok','✓ '+imgs.length+'枚から読み取りました');setTimeout(function(){document.querySelectorAll('.itab')[0].click();},1000);}catch(e){setMsg('scanStatus','err','⚠ '+e.message);}finally{btn.disabled=imgs.length===0;}}
+async function extractFromImg(dataUrl){var parts=dataUrl.split(','),mt=parts[0].match(/:(.*?);/)[1],b64=parts[1];var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:mt,data:b64}},{type:'text',text:'この画像から連絡先情報を抽出。1件1行（名前 会社名 電話番号 メール）。ない項目はスキップ。連絡先なければ「なし」のみ。'}]}]})});if(!res.ok)throw new Error('APIエラー '+res.status);var d=await res.json();var t=(d.content||[]).map(function(b){return b.text||'';}).join('').trim();return t==='なし'?'':t;}
+
+/* ── VCFエクスポート ── */
+function vcfEsc(s){return (s||'').replace(/\\/g,'\\\\').replace(/,/g,'\\,').replace(/;/g,'\\;');}
+function exportVCF(){
+  if(!contacts.length){alert('連絡先がありません');return;}
+  var ts=Date.now();
+  var cards=contacts.map(function(c,i){
+    var nm=(c.name||'').trim(),pts=nm?nm.split(/[ \u3000]+/):[],family=pts[0]||'',given=pts.slice(1).join(' ');
+    // FN：会社名がある場合は「会社名　人名」の順でiPhoneの一覧表示に反映
+    var fn=c.company?(nm?c.company+'　'+nm:c.company):(nm||'（名前なし）');
+    var rows=['BEGIN:VCARD','VERSION:3.0','FN:'+vcfEsc(fn),'N:'+vcfEsc(family)+';'+vcfEsc(given)+';;;'];
+    if(c.company)rows.push('ORG:'+vcfEsc(c.company));
+    if(c.phone){var pt=/^0[789]0/.test(c.phone.replace(/[-\s]/g,''))?'CELL':'WORK';rows.push('TEL;TYPE='+pt+':'+c.phone);}
+    if(c.email)rows.push('EMAIL;TYPE=INTERNET:'+c.email);
+    rows.push('UID:rnk-'+ts+'-'+i);
+    rows.push('END:VCARD');
+    return rows.join('\r\n');
+  });
+  var content=cards.join('\r\n\r\n')+'\r\n';
+  var fn='連絡帳_'+contacts.length+'件.vcf';
+  var blob=new Blob([content],{type:'text/x-vcard;charset=utf-8'});
+  // デスクトップ: 自動ダウンロード
+  if(!/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)){
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');a.href=url;a.download=fn;
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){URL.revokeObjectURL(url);a.remove();},2000);
+    return;
+  }
+  // スマホ: Web Share API
+  var file=new File([blob],fn,{type:'text/x-vcard'});
+  if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+    navigator.share({files:[file],title:fn}).catch(function(){});
+    return;
+  }
+  // フォールバック: タップ可能なリンク（SafariがVCFを開いて連絡先に追加できる）
+  _showDlModal(URL.createObjectURL(blob),fn,'リンクをタップしてVCFを開くと\n連絡先に追加できます');
+}
+
+/* ── ダウンロードモーダル ── */
+var _dlUrl=null;
+function closeDlModal(){
+  document.getElementById('dlModal').classList.remove('on');
+  if(_dlUrl){setTimeout(function(){URL.revokeObjectURL(_dlUrl);_dlUrl=null;},1000);}
+}
+function _showDlModal(url,name,msg){
+  _dlUrl=url;
+  document.getElementById('dlMsg').textContent=msg||'リンクをタップしてファイルを開いてください';
+  var lk=document.getElementById('dlLink');
+  lk.href=url;lk.textContent=name;
+  // downloadはデスクトップのみ有効（モバイルSafariは無視するが害はない）
+  lk.download=name;
+  document.getElementById('dlModal').classList.add('on');
+}
+
+/* ── 共通ダウンロード ── */
+function dl(content,name,mime){
+  var blob=new Blob([content],{type:mime+';charset=utf-8'});
+  // デスクトップ: 自動クリックで即ダウンロード
+  if(!/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)){
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');a.href=url;a.download=name;
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){URL.revokeObjectURL(url);a.remove();},2000);
+    return;
+  }
+  // スマホ: Web Share API（iOS15+/Android対応）
+  var file=new File([blob],name,{type:mime});
+  if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+    navigator.share({files:[file],title:name}).catch(function(){});
+    return;
+  }
+  // フォールバック: タップ可能なリンクを表示
+  _showDlModal(URL.createObjectURL(blob),name,'リンクをタップして保存してください');
+}
+function exportCSV(){var h='名前,会社名,電話番号,メール\n';var rows=contacts.map(function(c){return [c.name,c.company,c.phone,c.email].map(function(v){return '"'+(v||'').replace(/"/g,'""')+'"';}).join(',');});dl('\uFEFF'+h+rows.join('\n'),'連絡帳.csv','text/csv');}
+function exportTSV(){var h='名前\t会社名\t電話番号\tメール\n';var rows=contacts.map(function(c){return [c.name,c.company,c.phone,c.email].join('\t');});dl('\uFEFF'+h+rows.join('\n'),'連絡帳.tsv','text/tab-separated-values');}
+function exportText(){dl(contacts.map(function(c){return [c.name,c.company,c.phone,c.email].filter(Boolean).join('　');}).join('\n'),'連絡帳.txt','text/plain');}
+
+/* ── ローカル保存 ── */
+function saveLocal(){try{localStorage.setItem(STORE,JSON.stringify({contacts:contacts,savedAt:new Date().toISOString()}));document.getElementById('saveSt').textContent='✓ '+contacts.length+'件を保存しました';checkLocal();}catch(e){document.getElementById('saveSt').textContent='⚠ 保存失敗: '+e.message;}}
+function loadLocal(){try{var d=JSON.parse(localStorage.getItem(STORE)||'null');if(!d)return;contacts=d.contacts||[];removedDups=[];fixedCnt=0;aiCnt=0;updateStats();renderDups();renderList();show('statsBar');show('expDiv');show('expSec');document.getElementById('saveSt').textContent='✓ '+contacts.length+'件を読み込みました';document.querySelectorAll('.tab')[1].click();}catch(e){alert('読み込み失敗: '+e.message);}}
+function clearLocal(){if(!confirm('保存済みデータを削除しますか？'))return;localStorage.removeItem(STORE);document.getElementById('loadRow').classList.remove('on');document.getElementById('saveSt').textContent='削除しました';}
+function checkLocal(){try{var d=JSON.parse(localStorage.getItem(STORE)||'null');var row=document.getElementById('loadRow');if(!d||!row){if(row)row.classList.remove('on');return;}row.classList.add('on');var dt=new Date(d.savedAt);var info=document.getElementById('loadInfo');if(info)info.textContent='保存済み: '+(d.contacts||[]).length+'件（'+(dt.getMonth()+1)+'/'+dt.getDate()+' '+String(dt.getHours()).padStart(2,'0')+':'+String(dt.getMinutes()).padStart(2,'0')+'）';}catch(e){var row2=document.getElementById('loadRow');if(row2)row2.classList.remove('on');}}
+
+/* ── サンプル ── */
+function loadSample(){document.getElementById('inputData').value=['山田 花子 株式会社サンプル 03-1234-5678 yamada@sample.co.jp','株式会社サンプル 山田 花子 yamada@sample.co.jp','佐藤 次郎 090-9876-5432','佐藤 次郎 090-9876-5432','鈴木 一郎 株式会社テスト taro@test.co.jp','テスト株式会社 鈴木 一郎 taro@test.co.jp','田中 美咲 有限会社山田商店 080-1111-2222','阿部健太さん 03-5555-7777 abe@mail.com','中村 優子 合同会社フューチャー nakamura@future.co.jp','渡辺 智子 wata@example.jp 090-3333-4444','石川亮一工務店 03-2222-3333','林 早紀 hayashi@example.net','ヤマダ電機 0120-111-222','さくら歯科クリニック 045-333-4444'].join('\n');}
+
+/* ── スワイプ閉じ ── */
+(function(){var sy=0,sh=document.getElementById('sheet');sh.addEventListener('touchstart',function(e){sy=e.touches[0].clientY;},{passive:true});sh.addEventListener('touchend',function(e){if(e.changedTouches[0].clientY-sy>70)closeSheet();},{passive:true});})();
+
+/* ── 起動 ── */
+window.addEventListener('DOMContentLoaded',function(){checkLocal();if(localStorage.getItem(STORE)){show('expDiv');show('expSec');}});
+</script>
+</body>
+</html>
+t@400;600&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{--ink:#1a1410;--paper:#f5f0e8;--dark:#e8e0d0;--red:#8b3a2a;--red2:#c4664f;--blue:#4a6e88;--green:#4a7a4e;--muted:#7a6e62;--line:#c8bfb0;--sb:env(safe-area-inset-bottom,0px);--st:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
